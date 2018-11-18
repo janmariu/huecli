@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const http = require('http');
 
 const _config = { 
@@ -6,22 +8,32 @@ const _config = {
 	path: '/api/xMOIj8mpGZROeXvsL2fNwjBSGDvb0TwwKN2gHAcP'
 };
 
-main();
+cmd();
 
-async function main()
+async function cmd()
 {
-	let status = await isGroupOn(3, _config);
-
-	if(status)
-	{
-		toggleGroup(3, _config, false);
-	}
-	else
-	{
-		toggleGroup(3, _config, true);
+	//app room -> list available rooms
+	if(process.argv[2] === 'room' && !process.argv[3])
+	{	
+		const rooms = await getLightsForRooms(_config);
+		rooms.map((room) => {
+			console.log(`name: ${room.room}`);
+		});
 	}
 
-	console.log('Main has ended.');
+	//app room number -> show status for given room.
+	if(process.argv[2] === 'room' && process.argv[3] && !process.argv[4]) 
+	{
+		const on = await isGroupOn(process.argv[3], _config);
+		console.log(`Lights in room ${process.argv[3]} are ${on ? 'on' : 'off'}`);
+	}
+
+	//app room number on/off -> switch room lights on or off
+	if(process.argv[2] === 'room' && process.argv[3] && (process.argv[4] === 'on' || process.argv[4] === 'off'))
+	{
+		console.log(`Turning room ${process.argv[3]} ${process.argv[4]}`);
+		await toggleGroup(process.argv[3], _config, process.argv[4] === 'on');		
+	}	
 }
 
 async function isGroupOn(group, config)
@@ -39,7 +51,7 @@ async function toggleGroup(group, config, newState)
 	 }, payload); 
 }
 
-async function getLightList(config)
+async function getLightsForRooms(config)
 {
 	const roomJson = await get({ ...config, path: `${config.path}/groups` });
 
