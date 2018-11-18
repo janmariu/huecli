@@ -1,8 +1,5 @@
 const http = require('http');
 
-const USERNAME = 'xMOIj8mpGZROeXvsL2fNwjBSGDvb0TwwKN2gHAcP'
-const HOST = '192.168.1.132'
-
 const _config = { 
 	hostname : '192.168.1.132', 
 	port: 80,
