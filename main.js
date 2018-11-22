@@ -44,6 +44,12 @@ async function cmd()
 		console.log(`Turning room ${process.argv[3]} ${process.argv[4]}`);
 		await toggleGroup(process.argv[3], _config, process.argv[4] === 'on');		
 	}	
+
+	if(process.argv[2] === 'light' && !process.argv[3])
+	{
+		const lights = await getLights(_config);
+		lights.map((light) => console.log(`${light.index} ${light.name} ${light.on ? 'on' : 'off'} ${light.online ? 'online' : 'offline'} brightness: ${light.brightness}`));
+	}
 }
 
 async function isGroupOn(group, config)
@@ -59,6 +65,20 @@ async function toggleGroup(group, config, newState)
 		...config,
 		path: `${config.path}/groups/${group}/action`
 	 }, payload); 
+}
+
+async function getLights(config)
+{
+	const lights = await get({ ...config, path: `${config.path}/lights` });
+
+	return Object.values(lights).map((light, index) => {
+		return { 
+		  index: index+1, 
+		  name: light.name, 
+		  on: light.state.on,
+		  online: light.state.reachable,
+		  brightness: light.state.bri };
+	  });
 }
 
 async function getLightsForRooms(config)
