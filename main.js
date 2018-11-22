@@ -26,7 +26,7 @@ async function cmd()
 	{	
 		const rooms = await getLightsForRooms(_config);
 		rooms.map((room) => {
-			console.log(`name: ${room.room}`);
+			console.log(`${room.roomnumber} ${room.room}`);
 		});
 	}
 
@@ -66,8 +66,8 @@ async function getLightsForRooms(config)
 	const roomJson = await get({ ...config, path: `${config.path}/groups` });
 
 	return Object.values(roomJson).map(
-		(room) => room.lights.map(
-		  (light) => { return { light: light, room: room.name }; } 
+		(room, idx) => room.lights.map(
+		  (light) => { return { roomnumber: idx+1, light: light, room: room.name }; } 
 	  )).reduce((reduced, next) => reduced.concat(next));
 }
 
